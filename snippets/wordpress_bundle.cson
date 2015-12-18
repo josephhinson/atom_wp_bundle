@@ -24,7 +24,6 @@
   "Comment Form":
     prefix: "comments"
     body: "<?php comments_template(); ?>"
-
   "Comment Styles [avatarleft]":
     prefix: "commentstyling"
     body: '''
@@ -96,6 +95,20 @@
       span.says {
           display: none;
       }
+
+    '''
+  "Stylesheet Header":
+    prefix: "themeinfo"
+    body: '''
+      /*
+      Theme Name: $1
+      Theme URI: http://${2:Yoursite.com/}
+      Description: $3
+      Version: 1.0
+      Author: ${4:Your Name Here}
+      Author URI: http://${5:yoursite.com}
+      */
+      $6
 
     '''
   "Comment link":
