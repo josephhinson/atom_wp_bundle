@@ -1,0 +1,701 @@
+"*":
+  "Archive Titles":
+    prefix: "archive_titles"
+    body: '''
+      <?php /* If this is a category archive */ if (is_search()) { ?>
+      	<h1 class="pagetitle">Search Results</h1>
+      <?php /* If this is a category archive */ } elseif (is_category()) { ?>
+      	<h1 class="pagetitle">Posts filed under &ldquo;<?php single_cat_title(); ?>&rdquo;</h1>
+      <?php /* If this is a tag archive */ } elseif( is_tag() ) { ?>
+      	<h1 class="pagetitle">Posts Tagged &#8216;<?php single_tag_title(); ?>&#8217;</h1>
+      <?php /* If this is a daily archive */ } elseif (is_day()) { ?>
+      	<h1 class="pagetitle">Archive for <?php the_time('F jS, Y'); ?></h1>
+      <?php /* If this is a monthly archive */ } elseif (is_month()) { ?>
+      	<h1 class="pagetitle">Archive for <?php the_time('F, Y'); ?></h1>
+      <?php /* If this is a yearly archive */ } elseif (is_year()) { ?>
+      	<h1 class="pagetitle">Archive for <?php the_time('Y'); ?></h1>
+      <?php /* If this is an author archive */ } elseif (is_author()) { ?>
+      	<h1 class="pagetitle">Author Archive</h1>
+      <?php /* If this is a paged archive */ } else { ?>
+      	<h1 class="pagetitle"><a href="/blog">Blog</a></h1>
+      	<a class="rss" href="<?php bloginfo('rss2_url'); ?>">rss</a>
+      <?php } ?>
+    '''
+  "Comment Form":
+    prefix: "comments"
+    body: "<?php comments_template(); ?>"
+
+  "Comment Styles [avatarleft]":
+    prefix: "commentstyling"
+    body: '''
+      /* ==========================================
+      =====!  Comment styles  =====
+      ============================================*/
+      .postmeta .share .right {
+          margin-left: 10px;
+      }
+      #respond h3, h3#comments {
+          color: #000000;
+          font-size: 18px;
+          font-weight: normal;
+          line-height: 24px;
+          margin-bottom: 10px;
+      }
+      h3#comments {
+          border-bottom: 1px solid #E8E8E8;
+          padding-bottom: 4px;
+      }
+      #commentform {
+      }
+      #commentform #submit {
+          background: #DE4C2C;
+          color: #FFFFFF;
+          font: bold 13px Helvetica,Arial,sans-serif;
+          padding: 5px 10px;
+          text-shadow: -1px -1px 0 rgba(0, 0, 0, 0.2);
+      }
+      #commentform input, #commentform textarea {
+          background: none repeat scroll 0 0 #FFFFFF;
+          border: 1px solid #555555;
+          padding: 3px 4px;
+      }
+      #commentform textarea {
+          width: 96%;
+      }
+      .format_text input.form_submit, #commentform .form_submit {
+      }
+      .commentlist li {
+          border-bottom: 1px solid #CCCCCC;
+          font-size: 13px;
+          padding: 10px 0;
+      }
+      .comment-body {
+          margin-left: 85px;
+          position: relative;
+      }
+      .avatar {
+          left: -85px;
+          position: absolute;
+          top: 0;
+      }
+      cite.fn, cite.fn a {
+          float: left;
+          font-size: 15px;
+          font-style: normal;
+          font-weight: bold;
+          padding-right: 10px;
+          text-decoration: none;
+      }
+      .comment-meta a {
+          color: #555555;
+          text-decoration: none;
+      }
+      .comment-meta {
+          margin-bottom: 8px;
+      }
+      span.says {
+          display: none;
+      }
+
+    '''
+  "Comment link":
+    prefix: "comment_link"
+    body: "<?php comments_popup_link('${1:No Comments}', '${2:1 Comment}', '${3:% Comments}'); ?>"
+  "Custom Excerpt / Content":
+    prefix: "function_custom_excerpt"
+    body: '''
+      function excerpt($limit) {
+            $excerpt = explode(' ', get_the_excerpt(), $limit);
+            if (count($excerpt)>=$limit) {
+              array_pop($excerpt);
+              $excerpt = implode(" ",$excerpt).'...';
+            } else {
+              $excerpt = implode(" ",$excerpt);
+            }
+            $excerpt = preg_replace('`\\[[^\\]]*\\]`','',$excerpt);
+            return $excerpt;
+          }
+
+          function content($limit) {
+            $content = explode(' ', get_the_content(), $limit);
+            if (count($content)>=$limit) {
+              array_pop($content);
+              $content = implode(" ",$content).'...';
+            } else {
+              $content = implode(" ",$content);
+            }
+            $content = preg_replace('/\\[.+\\]/','', $content);
+            $content = apply_filters('the_content', $content);
+            $content = str_replace(']]>', ']]&gt;', $content);
+            return $content;
+          }
+
+    '''
+  "Custom Field (inside php)":
+    prefix: "gpm"
+    body: "get_post_meta($post->ID, '${1:customfield}', true);"
+  "Define Site URL (wp config lines)":
+    prefix: "define_siteurl"
+    body: '''
+      define('WP_HOME','$1');
+      define('WP_SITEURL','$1');
+      $2
+    '''
+  "Dynamic Sidebar":
+    prefix: "wig_sidebar"
+    body: '''
+      <?php 	/* Widgetized sidebar, if you have the plugin installed. */
+      		if ( !function_exists('dynamic_sidebar') || !dynamic_sidebar($1) ) : ?>
+      $2
+      <?php endif; ?>
+    '''
+  "Echo Custom Field":
+    prefix: "echo_gpm"
+    body: "<?php echo get_post_meta($post->ID, '${1:customfield}', true); ?>$2"
+  "Edit This Post Link":
+    prefix: "edit_post_link"
+    body: "<?php edit_post_link('${1:Edit this entry.}', '${2:<p>}', '${3:</p>}'); ?>"
+  "Exclude Page from Search Results":
+    prefix: "exclude_from_search"
+    body: '''
+      function mySearchFilter($query) {
+      if ($query->is_search) {
+      $query->set('post__not_in', array($1));
+      }
+      return $query;
+      }
+      add_filter('pre_get_posts','mySearchFilter');
+    '''
+  "Featured Image SRC":
+    prefix: "imgsrc"
+    body: '''
+      $imgsrc = wp_get_attachment_image_src( get_post_thumbnail_id( $post->ID ), ${1:array(591,456)});
+      $imgsrc[0];
+
+    '''
+  "Function enqueue jquery":
+    prefix: "function_ready_jQuery"
+    body: '''
+      function ready_jQuery() {
+          wp_enqueue_script('jquery');
+      }
+      add_action('init', 'ready_jQuery');
+    '''
+  "Function is_subpage":
+    prefix: "is_subpage"
+    body: '''
+      // Function checks to see if your on a subpage so that you can use the call "if (is_subpage())"
+      function is_subpage() {
+      	global $post;                                 // load details about this page
+              if ( is_page() && $post->post_parent ) {      // test to see if the page has a parent
+                     $parentID = $post->post_parent;        // the ID of the parent is this
+                     return $parentID;                      // return the ID
+              } else {                                      // there is no parent so...
+                     return false;                          // ...the answer to the question is false
+              };
+      };
+    '''
+  "Function is_tree":
+    prefix: "function_is_tree"
+    body: '''
+      //This function checks to see if you are on any descendent of a specific page ID, accepts one parameter for ID.
+      function is_tree($pid) {      // $pid = The ID of the page we're looking for pages underneath
+      	global $post;         // load details about this page
+      	$anc = get_post_ancestors( $post->ID );
+      	foreach($anc as $ancestor) {
+      		if(is_page() && $ancestor == $pid) {
+      			return true;
+      		}
+      	}
+      	if(is_page()&&(is_page($pid)))
+                     return true;   // we're at the page or at a sub page
+      	else
+                     return false;  // we're elsewhere
+      };
+
+    '''
+  "Function wt_get_depth":
+    prefix: "function_get_depth"
+    body: '''
+      // This function checks to see what level of depth you are currently on.
+      // More here: http://www.web-templates.nu/2008/09/07/get-depth-like-is_child-is_grandchild/
+      function wt_get_depth($id = '', $depth = '', $i = 0)
+      {
+      	global $wpdb;
+      	global $post;
+
+      	if($depth == '')
+      	{
+      		if(is_page())
+      		{
+      			if($id == '')
+      			{
+      				$id = $post->ID;
+      			}
+      			$depth = $wpdb->get_var("SELECT post_parent FROM $wpdb->posts WHERE ID = '".$id."'");
+      			return wt_get_depth($id, $depth, $i);
+      		}
+      	}
+      	elseif($depth == "0")
+      	{
+      		return $i;
+      	}
+      	else
+      	{
+      		$depth = $wpdb->get_var("SELECT post_parent FROM $wpdb->posts WHERE ID = '".$depth."'");
+      		$i++;
+      		return wt_get_depth($id, $depth, $i);
+      	}
+      }
+    '''
+  "List Categories":
+    prefix: "list_cats"
+    body: "<?php wp_list_cats(); ?>"
+  "List Pages":
+    prefix: "list_pages"
+    body: "<?php wp_list_pages($1); ?>\t"
+  "Nav Filter -- adds hilight to nav":
+    prefix: "nav_filter"
+    body: '''
+      function remove_parent_classes($class)
+      {
+        // check for current page classes, return false if they exist.
+      	return ($class == 'current_page_item' || $class == 'current_page_parent' || $class == 'current_page_ancestor'  || $class == 'current-menu-item') ? FALSE : TRUE;
+      }
+
+      function add_class_to_wp_nav_menu($classes)
+      {
+           switch (get_post_type())
+           {
+           	case '${1:post-type}':
+           		// we're viewing a custom post type, so remove the 'current_page_xxx and current-menu-item' from all menu items.
+           		$classes = array_filter($classes, "remove_parent_classes");
+
+           		// add the current page class to a specific menu item (replace ###).
+           		if (in_array('${2:menu_ID}', $classes))
+           		{
+           		   $classes[] = 'current_page_parent';
+               }
+           		break;
+
+            // add more cases if necessary and/or a default
+           }
+      	return $classes;
+      }
+      add_filter('nav_menu_css_class', 'add_class_to_wp_nav_menu');
+    '''
+  Navigation:
+    prefix: "navigation"
+    body: '''
+      <div class="navigation">
+      	<div class="alignleft"><?php next_posts_link('&larr; Older Entries') ?></div>
+      	<div class="alignright"><?php previous_posts_link('Newer Entries &rarr;') ?></div>
+      </div>
+    '''
+  "Next Post Link":
+    prefix: "next_post"
+    body: "<?php next_post_link(' ${1:%link} ') ?>"
+  "Page Template":
+    prefix: "page_template"
+    body: '''
+      <?php
+      /*
+      Template Name: $1
+      */
+
+      get_header(); ?>$2
+    '''
+  "Previous Post Link":
+    prefix: "previous_post"
+    body: "<?php previous_post_link(' ${1:%link} ') ?>"
+  "Print the category with links":
+    prefix: "the_category"
+    body: "<?php the_category('${1:, }') ?>"
+  "Print the tags with links":
+    prefix: "the_tags"
+    body: "<?php the_tags( '${1:<p>Tags: }', '${2, }', '${3</p>}'); ?>"
+  "Prints the author (no link)":
+    prefix: "the_author"
+    body: "<?php the_author(); ?>"
+  "Register Taxonomy":
+    prefix: "register_taxonomy"
+    body: '''
+      // Taxonomy for "${2:Label(plural)}" -- works like categories
+      register_taxonomy( '${1:cat_slug}', '${4:for_post_type}', array( 'hierarchical' => true, 'label' => '${2:Label(plural)}', 'query_var' => true, 'rewrite' => true, 'singular-label' => '${3:Label(singular)}') );
+    '''
+  "Register Widget Function":
+    prefix: "function_reg_widget"
+    body: '''
+      // This function Registers a Sidebar Widget, and allows you to expand the customization of your theme.
+      function $1() { ?>
+      	${3:Put Your widget code here}
+      <?php }
+      register_sidebar_widget("${2:Name of Widget}", "$1");
+      $4
+    '''
+  "Reset Query":
+    prefix: "reset_query"
+    body: "wp_reset_query();"
+  "SEO Logo":
+    prefix: "logo"
+    body: '''
+      <?php if (is_front_page()): ?>
+      	<h1 class="logo">
+      		<a href="<?php bloginfo('url'); ?>">${1:<?php bloginfo('name'); ?>}</a>
+      	</h1>
+      <?php else : ?>
+      	<div class="logo">
+      		<a href="<?php bloginfo('url'); ?>">${1:<?php bloginfo('name'); ?>}</a>
+      	</div>
+      <?php endif; ?>$2
+    '''
+  ShortCode:
+    prefix: "shortcode"
+    body: '''
+      // [$2]
+      function $1($atts) {
+      		extract(shortcode_atts(array(
+      			"$3" => $4
+              ), $atts));
+      		$return = '';
+      		$return .='$5';
+      		return $return;
+      }
+      add_shortcode("$2", "$1");
+      // end shortcode
+    '''
+  "Site URL":
+    prefix: "url"
+    body: "<?php bloginfo('url'); ?>"
+  "Stylesheet Header":
+    prefix: "themeinfo"
+    body: '''
+      /*
+      Theme Name: $1
+      Theme URI: http://${2:Yoursite.com/}
+      Description: $3
+      Version: 1.0
+      Author: ${4:Your Name Here}
+      Author URI: http://${5:yoursite.com}
+      */
+      $6
+
+
+    '''
+  "Template URL":
+    prefix: "template_url"
+    body: "<?php bloginfo('template_url'); ?>"
+  "The Loop":
+    prefix: "theloop"
+    body: '''
+      <?php if (have_posts()) : while (have_posts()) : the_post(); ?>
+      	${1:WhileStatement}
+      <?php endwhile; ?>
+      <?php endif; ?>
+    '''
+  "WP Widget":
+    prefix: "wp_widget"
+    body: '''
+      // This is a widget for $3
+
+      // initializes the widget on WordPress Load
+      add_action('widgets_init', '$2_init_widget');
+
+      // Should be called above from "add_action"
+      function $2_init_widget() {
+      	register_widget( '$1' );
+      }
+
+      // new class to extend WP_Widget function
+      class $1 extends WP_Widget {
+      	/** Widget setup.  */
+      	function $1() {
+      		/* Widget settings. */
+      		$widget_ops = array(
+      			'classname' => '$2_widget',
+      			'description' => __('$3', '$2_widget') );
+
+      		/* Widget control settings. */
+      		$control_ops = array( 'width' => 300, 'height' => 350, 'id_base' => '$2_widget' );
+
+      		/* Create the widget. */
+      		$this->WP_Widget( '$2_widget', __('$3 Widget', 'Options'), $widget_ops, $control_ops );
+      	}
+      	/**
+      	* How to display the widget on the screen. */
+      	function widget( $args, $instance ) {
+      		extract( $args );
+      		$title = apply_filters('widget_title', $instance['title'] );
+
+      		/* Before widget (defined by themes). */
+      		echo $before_widget;
+      		if ( $title )
+      			echo $before_title . $title . $after_title;
+
+      		/* Display name from widget settings if one was input. */
+
+      		// Settings from the widget
+      		$4
+
+      		/* After widget (defined by themes). */
+      		echo $after_widget;
+      	}
+
+      	/**
+      	 * Update the widget settings.
+      	 */
+      	function update( $new_instance, $old_instance ) {
+      		$instance = $old_instance;
+
+      		/* Strip tags for title and name to remove HTML (important for text inputs). */
+      		$instance['title'] = strip_tags( $new_instance['title'] );
+
+      		return $instance;
+      	}
+
+      /**
+       * Displays the widget settings controls on the widget panel.
+       * Make use of the get_field_id() and get_field_name() function
+       * when creating your form elements. This handles the confusing stuff.
+      */
+      function form($instance) {
+      	$defaults = array( 'title' => __('$3', '$2_widget'));
+      	$instance = wp_parse_args( (array) $instance, $defaults ); ?>
+      	<!-- Widget Title: Text Input -->
+      	<p>
+      		<label for="<?php echo $this->get_field_id( 'title' ); ?>"><?php _e('Title:', '$2_widget'); ?></label><br>
+      		<input type="text" class="widefat" id="<?php echo $this->get_field_id( 'title' ); ?>" name="<?php echo $this->get_field_name( 'title' ); ?>" value="<?php echo $instance['title']; ?>">
+      	</p>
+      	<?php
+      	}
+      } // END $1
+    '''
+  "WordPress Include":
+    prefix: "wp_include"
+    body: "<?php include (TEMPLATEPATH . '/$1'); ?>$2"
+  bloginfo:
+    prefix: "bloginfo"
+    body: "<?php bloginfo('$1'); ?>$2"
+  "custom login logo":
+    prefix: "cust_log_logo"
+    body: '''
+      function custom_login_logo() {
+          echo '<style type="text/css">
+              h1 a { background-image:url('.get_bloginfo('template_directory').'/images/vis-notetaking.png) !important;height:114px; }
+          </style>';
+      }
+      add_action('login_head', 'custom_login_logo');
+    '''
+  echo_option:
+    prefix: "ego"
+    body: "<?php echo get_option('$1'); ?>$2"
+  "get sidebar":
+    prefix: "get_sidebar"
+    body: "<?php get_sidebar(); ?>"
+  get_footer:
+    prefix: "get_footer"
+    body: "<?php get_footer(); ?>"
+  get_header:
+    prefix: "get_header"
+    body: "<?php get_header(); ?>"
+  get_option:
+    prefix: "go"
+    body: "get_option('$1');$2"
+  get_permalink:
+    prefix: "get_permalink"
+    body: "<?php echo get_permalink($1); ?>$2"
+  "get_post()":
+    prefix: "get_post"
+    body: '''
+      <?php
+      $${1:page} = ${2:ID};
+      $$1 = get_post($$1); ?>
+    '''
+  get_posts:
+    prefix: "get_posts"
+    body: "get_posts('numberposts=-1&orderby=menu_order&order=ASC&post_type=page&post_status=publish&post_parent='.$post->ID);"
+  "if on page":
+    prefix: "onpage"
+    body: "<?php if (is_page('$1')) : ?>class=\"current_page_item\" <?php endif; ?>"
+  is_category:
+    prefix: "is_category"
+    body: "<?php if (is_category('$1')${2: or (is_single() and in_category('$1'))}) :?>${3: class=\"current-page-item\"}<?php endif; ?>"
+  is_page:
+    prefix: "is_page"
+    body: "<?php if (${1:is_page('$2')}) : ?>${3: class=\"current_page_item\"}<?php endif; ?>$4"
+  "meta box":
+    prefix: "metabox"
+    body: '''
+      function $2() {
+      	global $post;
+      	$excerpt = get_post_meta($post->ID, '$2', true);
+      	echo $excerpt;
+      }
+      /* Define the custom box */
+
+      // WP 3.0+
+      add_action('add_meta_boxes', '$1_meta_box');
+
+      // backwards compatible
+      add_action('admin_init', '$1_meta_box', 1);
+
+      /* Do something with the data entered */
+      add_action('save_post', '$1_save_postdata');
+
+      /* Adds a box to the main column on the Post and Page edit screens */
+      function $1_meta_box() {
+          add_meta_box( '$1_sectionid', __( '${4:Title}', '$1_textdomain' ), '$1_inner_custom_box','${3:post_type}', 'normal');
+      }
+
+      /* Prints the box content */
+      function $1_inner_custom_box() {
+
+        // Use nonce for verification
+        wp_nonce_field( plugin_basename(__FILE__), '$1_noncename' );
+
+      	global $post;
+      	$${2:textareaname} = get_post_meta($post->ID, '$2', true);
+
+        // The actual fields for data entry ?>
+      <table border="0" cellspacing="5" cellpadding="5" width="100%">
+      	<tr>
+      	<td>
+      		<?php
+      		 wp_editor( $content = $$2, $editor_id = '$2', $settings = array(
+      			'textarea_name' => '$2',
+      			'textarea_rows' => '3'
+      		)); ?>
+      	</td>
+      	</tr>
+      </table>
+
+
+      <?php
+      }
+
+      /* When the post is saved, saves our custom data */
+      function $1_save_postdata( $post_id ) {
+
+        // verify this came from the our screen and with proper authorization,
+        // because save_post can be triggered at other times
+
+        if ( !wp_verify_nonce( $_POST['$1_noncename'], plugin_basename(__FILE__) ) )
+            return $post_id;
+        // verify if this is an auto save routine.
+        // If it is our form has not been submitted, so we dont want to do anything
+        if ( defined('DOING_AUTOSAVE') && DOING_AUTOSAVE )
+            return $post_id;
+
+
+        // Check permissions
+        if ( '$3' == $_POST['post_type'] )
+        {
+          if ( !current_user_can( 'edit_page', $post_id ) )
+              return $post_id;
+        }
+        else
+        {
+          if ( !current_user_can( 'edit_post', $post_id ) )
+              return $post_id;
+        }
+
+        // OK, we're authenticated: we need to find and save the data
+
+        	$$2 = $_POST['$2'];
+
+        // update the data
+      		update_post_meta($post_id, '$2', $$2);
+      }
+    '''
+  "nav li a":
+    prefix: "nav_li"
+    body: '''
+      .nav li a:hover,
+      .nav li.current-menu-item a,
+      .nav li.current_page_item a,
+      .nav li.current_page_parent a,
+      .nav li.current_page_ancestor a
+    '''
+  page_handle:
+    prefix: "page_handle"
+    body: '''
+      function page_handle() {
+      	global $post;
+      	$queue = '';
+      	if (is_front_page()) {
+      		$queue = 'home';
+      	} elseif (is_page()) {
+      		$queue = 'page';
+      	} elseif (get_post_type() == 'book' or is_post_type_archive('book')) {
+      		$queue = 'book';
+      	} elseif (is_home() or is_single() or is_category()) {
+      		$queue = 'blog';
+      	}
+      	echo $queue;
+      }
+    '''
+  permalink:
+    prefix: "the_permalink"
+    body: "<?php the_permalink(); ?>$1"
+  "query posts":
+    prefix: "query_posts"
+    body: "<?php query_posts($1); ?>$2"
+  "stylesheet url":
+    prefix: "stylesheet_url"
+    body: "<?php bloginfo('stylesheet_url'); ?>"
+  "the content":
+    prefix: "the_content"
+    body: '''
+      <?php the_content(); ?>
+
+    '''
+  "the excerpt":
+    prefix: "the_excerpt"
+    body: "<?php the_excerpt(); ?>"
+  "the time":
+    prefix: "the_time"
+    body: "<?php the_time('${1:l, F jS, Y}'); ?>"
+  "the title":
+    prefix: "the_title"
+    body: "<?php the_title(); ?>"
+  the_ID:
+    prefix: "the_ID"
+    body: "<?php the_ID(); ?>"
+  "the_title with link":
+    prefix: "title_link"
+    body: '''
+      <a href="<?php the_permalink() ?>" rel="bookmark" title="<?php the_title_attribute(); ?>"><?php the_title(); ?></a>
+
+    '''
+  "wp_nav_menu for ul.nav":
+    prefix: "topnav"
+    body: '''
+      <?php $args = array(
+      		  'menu'            => 'top-navigation',
+      		  'container_class' => 'nav',
+      		);
+      		// Nav menu found in Appearance > Menus
+      		wp_nav_menu($args); ?>
+    '''
+  wp_nav_menu:
+    prefix: "wp_nav_menu"
+    body: '''
+      <?php
+      $args = array(
+      'menu'            => '$1',
+      'container'       => '',
+      'menu_class' => '${2:dropdown-menu}',
+      );
+      wp_nav_menu( $args ); ?>
+    '''
+  wp_query:
+    prefix: "wp_query"
+    body: '''
+      <?php $${1:query} = new WP_Query(array(
+      	${2:'posts_per_page' => '3',}
+      	))
+      if ($$1->have_posts()) : while ($$1->have_posts()) : $$1-> the_post(); ?>
+      	$3
+      <?php endwhile; ?>
+      <?php endif; ?>
+    '''
